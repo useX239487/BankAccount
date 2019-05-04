@@ -87,7 +87,7 @@ namespace BankAccount
         //information for that class.
         public override string ToString()
         {
-            string displayString = "\nAccount Number: " + AccountNum + "\tAccount Balance: " + AccountBalance;
+            string displayString = "\nAccount Number: " + AccountNum + "\tAccount Balance: " + AccountBalance.ToString("C2");
 
             return displayString;
         }

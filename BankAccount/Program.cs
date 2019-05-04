@@ -23,13 +23,15 @@ namespace BankAccount
             int custNum;
 
             //Menu
-            while (selection != 5)
+            while (selection != 7)
             {
                 Console.WriteLine("1. Add an account");
                 Console.WriteLine("2. View account balances");
                 Console.WriteLine("3. (admin)View all Account Balances");
                 Console.WriteLine("4. Add new customer");
-                Console.WriteLine("5. Exit");
+                Console.WriteLine("5. Process loan payment");
+                Console.WriteLine("6. Accrue 1 month of interest on all accounts");
+                Console.WriteLine("7. Exit");
                 selection = Convert.ToInt32(Console.ReadLine());
 
                 if(selection == 1)
@@ -63,6 +65,54 @@ namespace BankAccount
                     }
                     Customers.Add(new Customer(cusNum, newCus, new List<Account>()));
                     Console.WriteLine("New Customer Info:" + Customers.Last().ToString());
+                }
+                else if (selection == 5)
+                {
+                    Console.Write("Enter an account number: ");
+                    int acctNum;
+                    if (!Int32.TryParse(Console.ReadLine(), out acctNum))
+                    {
+                        Console.WriteLine("Error: Account number must be an integer value.\n");
+                        continue;
+                    }
+
+                    Account acctObject = FindLoanAccount(acctNum);
+                    if (acctObject == null)
+                    {
+                        Console.WriteLine($"Error: Unable to find loan account number {acctNum}.\n");
+                        continue;
+                    }
+
+                    Console.Write("Enter loan payment amount: ");
+                    decimal payAmt;
+                    if (!Decimal.TryParse(Console.ReadLine(), out payAmt))
+                        Console.WriteLine("Error: Payment amount must be a decimal value.\n");
+                    else
+                    {
+                        try
+                        {
+                            ((LoanAccount)acctObject).LoanPayment(payAmt);
+                            UpdateAccountInList(acctObject);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Unable to make loan payment.\n{ex.Message}\n");
+                        }
+                    }
+                }
+                else if (selection == 6)
+                {
+                    foreach (Account acct in Accounts)
+                    {
+                        if (acct.GetType() == typeof(SavingsAccount)) // If account is savings, call MonthlyInt method.
+                        {
+                            ((SavingsAccount)acct).MonthlyInt(); 
+                        }
+                        else if (acct.GetType() == typeof(LoanAccount)) // If account is loan, call MonthlyInt method.
+                        {
+                            ((LoanAccount)acct).MonthlyInt();
+                        }
+                    }
                 }
 
 
@@ -165,6 +215,26 @@ namespace BankAccount
             }
             Console.WriteLine("I was unable to find a customer with this number.");
             return null;
+        }
+
+        // Find and return the Account object of the given account number (must be a loan)
+        public static Account FindLoanAccount(int acctNum)
+        {
+            Account acctObject;
+            acctObject = Accounts.Find(item => item.AccountNum == acctNum);
+            if (acctObject != null && acctObject.GetType() != typeof(LoanAccount)) // Make sure this is a loan account
+                acctObject = null;
+            return acctObject;
+        }
+
+        // Replace the Account object in the list with the Account object passed
+        public static void UpdateAccountInList(Account account)
+        {
+            int acctIndex = Accounts.FindIndex(item => item.AccountNum == account.AccountNum);
+            if (acctIndex == -1)
+                throw new Exception($"Account number {account.AccountNum} not found in accounts list. Unable to update record.");
+            else
+                Accounts[acctIndex] = account;
         }
     }
 }

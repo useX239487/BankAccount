@@ -77,13 +77,21 @@ namespace BankAccount
         //Calculates the amount of interset to be deposited, and increases the balance by that amount
         public void MonthlyInt()
         {
-            double increase = ((double)AccountBalance * AccountInterest);
+            double increase = ((double)AccountBalance * AccountInterest / 12); // divide by 12, interest rate is annual. 
             AccountBalance += (decimal)increase;
+        }
+
+        public void LoanPayment(decimal PaymentAmount)
+        {
+            if (AccountBalance - PaymentAmount < 0)
+                throw new Exception("Loan balance cannot be reduced below $0.00.");
+            else
+                AccountBalance -= PaymentAmount;
         }
 
         public override string ToString()
         {
-            string displayString = "\nAccount Number: " + AccountNum + "\tAccount Balance: " + AccountBalance + "\tAccount Interest Rate: " + AccountInterest + "\tDuration: " + AccountDuration;
+            string displayString = "\nAccount Number: " + AccountNum + "\tAccount Balance: " + AccountBalance.ToString("C2") + "\tAccount Interest Rate: " + AccountInterest.ToString("P3") + "\tDuration: " + AccountDuration;
 
             return displayString;
         }

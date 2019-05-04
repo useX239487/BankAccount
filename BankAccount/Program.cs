@@ -23,12 +23,13 @@ namespace BankAccount
             int custNum;
 
             //Menu
-            while (selection != 4)
+            while (selection != 5)
             {
                 Console.WriteLine("1. Add an account");
                 Console.WriteLine("2. View account balances");
                 Console.WriteLine("3. (admin)View all Account Balances");
-                Console.WriteLine("4. Exit");
+                Console.WriteLine("4. Add new customer");
+                Console.WriteLine("5. Exit");
                 selection = Convert.ToInt32(Console.ReadLine());
 
                 if(selection == 1)
@@ -52,7 +53,20 @@ namespace BankAccount
                     foreach (Customer c in Customers)
                         Console.WriteLine(c.ToString());
                 }
-            
+                else if (selection == 4)
+                {
+                    Console.Write("Please enter new customer name: ");
+                    string newCus = Console.ReadLine();
+                    int cusNum = 1;
+                    {
+                        cusNum += Customers.Last().CustomerNumber;
+                    }
+                    Customers.Add(new Customer(cusNum, newCus, new List<Account>()));
+                    Console.WriteLine("New Customer Info:" + Customers.Last().ToString());
+                }
+
+
+
                 Console.WriteLine();
             }
         }
